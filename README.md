@@ -36,9 +36,9 @@ flutter pub get
 
 ## Capturas de Tela
 
-- [Captura de Tela 1](URL_DA_CAPTURA1)
-- [Captura de Tela 2](URL_DA_CAPTURA2)
-- [Captura de Tela 3](URL_DA_CAPTURA3)
+- [Captura de Tela 1](Imgs/Imagem1.png)
+- [Captura de Tela 2](Imgs/Imagem2.png)
+- [Captura de Tela 3](Imgs/Imagem3.png)
 
 ## Contribuição
 
