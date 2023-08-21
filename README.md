@@ -20,11 +20,11 @@ Este aplicativo permite que você adicione livros à lista de registros por meio
 ## Como Usar
 1. Clone o repositorio.
    ```
-   git clone https://github.com/SEU_USUARIO/SEU_REPOSITORIO.git
+   git clone https://github.com/Weslx/Cadastro-de-livros.git
    ```
 2. Instale as dependências.
  ```
-cd SEU_REPOSITORIO
+cd Cadastro-de-livros
 flutter pub get
  ```
 
