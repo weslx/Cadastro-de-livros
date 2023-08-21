@@ -36,9 +36,9 @@ flutter pub get
 
 ## Capturas de Tela
 
-- [Captura de Tela 1](Imgs/Imagem1.png)
-- [Captura de Tela 2](Imgs/Imagem2.png)
-- [Captura de Tela 3](Imgs/Imagem3.png)
+- [Tela de cadastro](Imgs/Imagem1.png)
+- [Tela com os livros](Imgs/Imagem2.png)
+- [Apagar os dados do sql](Imgs/Imagem3.png)
 
 ## Contribuição
 
