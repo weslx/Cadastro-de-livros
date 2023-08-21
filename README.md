@@ -23,16 +23,16 @@ Este aplicativo permite que você adicione livros à lista de registros por meio
    git clone https://github.com/Weslx/Cadastro-de-livros.git
    ```
 2. Instale as dependências.
- ```
-cd Cadastro-de-livros
-flutter pub get
- ```
+    ```
+   cd Cadastro-de-livros
+   flutter pub get
+    ```
 
 4. Execute o aplicativo.
     ```
     flutter run
 
-     ```
+    ```
 
 ## Capturas de Tela
 
