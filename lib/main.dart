@@ -15,7 +15,7 @@ class CadastroLivrosApp extends StatelessWidget {
         scaffoldBackgroundColor: Color(0xFF2D2D37),
         primaryColor: Color.fromARGB(255, 250, 250, 250),
         hintColor: Color.fromARGB(255, 44, 44, 42),
-        iconTheme: IconThemeData(color: Color(0xFFFFC500)), // Cor dos ícones e dicas de texto
+        iconTheme: IconThemeData(color: Color(0xFFFFC500)),
       ),
       home: CadastroLivroScreen(),
     );
@@ -28,17 +28,18 @@ class CadastroLivroScreen extends StatefulWidget {
 }
 
 class _CadastroLivroScreenState extends State<CadastroLivroScreen> {
-  TextEditingController _nomeController = TextEditingController();
-  TextEditingController _autorController = TextEditingController();
-  TextEditingController _classificacaoController = TextEditingController();
-
-  late Database _database;
-
-  List<Map<String, dynamic>> _livros = [];
+  late final TextEditingController _nomeController;
+  late final TextEditingController _autorController;
+  late final TextEditingController _classificacaoController;
+  late final Database _database;
+  late List<Map<String, dynamic>> _livros;
 
   @override
   void initState() {
     super.initState();
+    _nomeController = TextEditingController();
+    _autorController = TextEditingController();
+    _classificacaoController = TextEditingController();
     _openDatabase();
   }
 
@@ -52,7 +53,6 @@ class _CadastroLivroScreenState extends State<CadastroLivroScreen> {
       },
       version: 1,
     );
-
     _atualizarListaLivros();
   }
 
@@ -62,17 +62,12 @@ class _CadastroLivroScreenState extends State<CadastroLivroScreen> {
       'autor': _autorController.text,
       'classificacao': _classificacaoController.text,
     };
-
     await _database.insert(
       'livros',
       livro,
       conflictAlgorithm: ConflictAlgorithm.replace,
     );
-
-    _nomeController.clear();
-    _autorController.clear();
-    _classificacaoController.clear();
-
+    _limparCampos();
     _atualizarListaLivros();
   }
 
@@ -86,6 +81,12 @@ class _CadastroLivroScreenState extends State<CadastroLivroScreen> {
   Future<void> _apagarDados() async {
     await _database.delete('livros');
     _atualizarListaLivros();
+  }
+
+  void _limparCampos() {
+    _nomeController.clear();
+    _autorController.clear();
+    _classificacaoController.clear();
   }
 
   @override
@@ -117,7 +118,7 @@ class _CadastroLivroScreenState extends State<CadastroLivroScreen> {
               ElevatedButton(
                 onPressed: _cadastrarLivro,
                 style: ElevatedButton.styleFrom(
-                  primary: Theme.of(context).hintColor, // Cor de destaque
+                  primary: Theme.of(context).hintColor,
                 ),
                 child: Text('Cadastrar Livro'),
               ),
