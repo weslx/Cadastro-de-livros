@@ -11,7 +11,12 @@ class CadastroLivrosApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Cadastro de Livros',
-      theme: ThemeData.dark(),
+      theme: ThemeData.dark().copyWith(
+        scaffoldBackgroundColor: Color(0xFF2D2D37),
+        primaryColor: Color.fromARGB(255, 250, 250, 250),
+        hintColor: Color.fromARGB(255, 44, 44, 42),
+        iconTheme: IconThemeData(color: Color(0xFFFFC500)), // Cor dos ícones e dicas de texto
+      ),
       home: CadastroLivroScreen(),
     );
   }
@@ -111,6 +116,9 @@ class _CadastroLivroScreenState extends State<CadastroLivroScreen> {
               SizedBox(height: 16.0),
               ElevatedButton(
                 onPressed: _cadastrarLivro,
+                style: ElevatedButton.styleFrom(
+                  primary: Theme.of(context).hintColor, // Cor de destaque
+                ),
                 child: Text('Cadastrar Livro'),
               ),
             ],
