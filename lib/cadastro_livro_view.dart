@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:sqflite/sqflite.dart';
-import 'package:path/path.dart';
+import 'cadastro_livro_controller.dart';
 
 void main() {
   runApp(CadastroLivrosApp());
@@ -28,32 +27,15 @@ class CadastroLivroScreen extends StatefulWidget {
 }
 
 class _CadastroLivroScreenState extends State<CadastroLivroScreen> {
-  late final TextEditingController _nomeController;
-  late final TextEditingController _autorController;
-  late final TextEditingController _classificacaoController;
-  late final Database _database;
-  late List<Map<String, dynamic>> _livros;
+  final CadastroLivroController _controller = CadastroLivroController();
+  final TextEditingController _nomeController = TextEditingController();
+  final TextEditingController _autorController = TextEditingController();
+  final TextEditingController _classificacaoController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
-    _nomeController = TextEditingController();
-    _autorController = TextEditingController();
-    _classificacaoController = TextEditingController();
-    _openDatabase();
-  }
-
-  Future<void> _openDatabase() async {
-    _database = await openDatabase(
-      join(await getDatabasesPath(), 'livros_database.db'),
-      onCreate: (db, version) {
-        return db.execute(
-          'CREATE TABLE livros(id INTEGER PRIMARY KEY, nome TEXT, autor TEXT, classificacao TEXT)',
-        );
-      },
-      version: 1,
-    );
-    _atualizarListaLivros();
+    _controller.inicializar();
   }
 
   Future<void> _cadastrarLivro() async {
@@ -62,25 +44,18 @@ class _CadastroLivroScreenState extends State<CadastroLivroScreen> {
       'autor': _autorController.text,
       'classificacao': _classificacaoController.text,
     };
-    await _database.insert(
-      'livros',
-      livro,
-      conflictAlgorithm: ConflictAlgorithm.replace,
-    );
+    await _controller.cadastrarLivro(livro);
     _limparCampos();
-    _atualizarListaLivros();
-  }
-
-  Future<void> _atualizarListaLivros() async {
-    final livros = await _database.query('livros');
-    setState(() {
-      _livros = livros;
-    });
   }
 
   Future<void> _apagarDados() async {
-    await _database.delete('livros');
-    _atualizarListaLivros();
+    showDialog(
+      context: context,
+      builder: (context) => ApagarDadosDialog(onApagarDados: () async {
+        await _controller.apagarDados();
+        Navigator.pop(context); // Fecha o diálogo de confirmação
+      }),
+    );
   }
 
   void _limparCampos() {
@@ -140,18 +115,13 @@ class _CadastroLivroScreenState extends State<CadastroLivroScreen> {
                 onPressed: () {
                   showDialog(
                     context: context,
-                    builder: (context) => LivrosDialog(livros: _livros),
+                    builder: (context) => LivrosDialog(livros: _controller.livros),
                   );
                 },
                 icon: Icon(Icons.search),
               ),
               IconButton(
-                onPressed: () {
-                  showDialog(
-                    context: context,
-                    builder: (context) => ApagarDadosDialog(onApagarDados: _apagarDados),
-                  );
-                },
+                onPressed: _apagarDados,
                 icon: Icon(Icons.settings),
               ),
             ],
@@ -238,10 +208,7 @@ class ApagarDadosDialog extends StatelessWidget {
           child: Text('Cancelar'),
         ),
         TextButton(
-          onPressed: () {
-            onApagarDados();
-            Navigator.pop(context);
-          },
+          onPressed: onApagarDados,
           child: Text(
             'Apagar',
             style: TextStyle(color: Colors.red),
