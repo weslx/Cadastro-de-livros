@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:sqflite/sqflite.dart';
-import 'package:path/path.dart';
+import 'cadastro_livro_controller.dart';
 
 void main() {
   runApp(CadastroLivrosApp());
@@ -11,7 +10,12 @@ class CadastroLivrosApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Cadastro de Livros',
-      theme: ThemeData.dark(),
+      theme: ThemeData.dark().copyWith(
+        scaffoldBackgroundColor: Color(0xFF2D2D37),
+        primaryColor: Color.fromARGB(255, 250, 250, 250),
+        hintColor: Color.fromARGB(255, 44, 44, 42),
+        iconTheme: IconThemeData(color: Color(0xFFFFC500)),
+      ),
       home: CadastroLivroScreen(),
     );
   }
@@ -23,32 +27,15 @@ class CadastroLivroScreen extends StatefulWidget {
 }
 
 class _CadastroLivroScreenState extends State<CadastroLivroScreen> {
-  TextEditingController _nomeController = TextEditingController();
-  TextEditingController _autorController = TextEditingController();
-  TextEditingController _classificacaoController = TextEditingController();
-
-  late Database _database;
-
-  List<Map<String, dynamic>> _livros = [];
+  final CadastroLivroController _controller = CadastroLivroController();
+  final TextEditingController _nomeController = TextEditingController();
+  final TextEditingController _autorController = TextEditingController();
+  final TextEditingController _classificacaoController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
-    _openDatabase();
-  }
-
-  Future<void> _openDatabase() async {
-    _database = await openDatabase(
-      join(await getDatabasesPath(), 'livros_database.db'),
-      onCreate: (db, version) {
-        return db.execute(
-          'CREATE TABLE livros(id INTEGER PRIMARY KEY, nome TEXT, autor TEXT, classificacao TEXT)',
-        );
-      },
-      version: 1,
-    );
-
-    _atualizarListaLivros();
+    _controller.inicializar();
   }
 
   Future<void> _cadastrarLivro() async {
@@ -57,30 +44,24 @@ class _CadastroLivroScreenState extends State<CadastroLivroScreen> {
       'autor': _autorController.text,
       'classificacao': _classificacaoController.text,
     };
-
-    await _database.insert(
-      'livros',
-      livro,
-      conflictAlgorithm: ConflictAlgorithm.replace,
+    await _controller.cadastrarLivro(livro);
+    _limparCampos();
+  }
+  
+  Future<void> _apagarDados() async {
+    showDialog(
+      context: context,
+      builder: (context) => ApagarDadosDialog(onApagarDados: () async {
+        await _controller.apagarDados();
+        Navigator.pop(context); // Fecha o diálogo de confirmação
+      }),
     );
+  }
 
+  void _limparCampos() {
     _nomeController.clear();
     _autorController.clear();
     _classificacaoController.clear();
-
-    _atualizarListaLivros();
-  }
-
-  Future<void> _atualizarListaLivros() async {
-    final livros = await _database.query('livros');
-    setState(() {
-      _livros = livros;
-    });
-  }
-
-  Future<void> _apagarDados() async {
-    await _database.delete('livros');
-    _atualizarListaLivros();
   }
 
   @override
@@ -111,6 +92,9 @@ class _CadastroLivroScreenState extends State<CadastroLivroScreen> {
               SizedBox(height: 16.0),
               ElevatedButton(
                 onPressed: _cadastrarLivro,
+                style: ElevatedButton.styleFrom(
+                  primary: Theme.of(context).hintColor,
+                ),
                 child: Text('Cadastrar Livro'),
               ),
             ],
@@ -131,18 +115,13 @@ class _CadastroLivroScreenState extends State<CadastroLivroScreen> {
                 onPressed: () {
                   showDialog(
                     context: context,
-                    builder: (context) => LivrosDialog(livros: _livros),
+                    builder: (context) => LivrosDialog(livros: _controller.livros),
                   );
                 },
                 icon: Icon(Icons.search),
               ),
               IconButton(
-                onPressed: () {
-                  showDialog(
-                    context: context,
-                    builder: (context) => ApagarDadosDialog(onApagarDados: _apagarDados),
-                  );
-                },
+                onPressed: _apagarDados,
                 icon: Icon(Icons.settings),
               ),
             ],
@@ -229,10 +208,7 @@ class ApagarDadosDialog extends StatelessWidget {
           child: Text('Cancelar'),
         ),
         TextButton(
-          onPressed: () {
-            onApagarDados();
-            Navigator.pop(context);
-          },
+          onPressed: onApagarDados,
           child: Text(
             'Apagar',
             style: TextStyle(color: Colors.red),
