@@ -69,6 +69,5 @@ class CadastroLivroModel {
 
     await File(path).writeAsBytes(bytes);
 
-    print("Loaded sample database");
   }
 }
